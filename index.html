@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>アートクリエイター・児童文化部 個展会場</title>
   <style>
-    /* ページ全体：重厚な赤と黒のグラデーション */
     body { 
       margin: 0; padding: 0; 
       background: radial-gradient(circle at 50% 50%, #4a0e17 0%, #290a0f 50%, #1a0b0d 100%); 
@@ -12,7 +11,6 @@
       overflow: hidden; height: 100vh;
     }
 
-    /* 扉の左右パネル：アニメーションの重みを演出 */
     #door-overlay { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       z-index: 9999; display: flex; transition: opacity 2.0s ease-in-out; 
@@ -27,39 +25,39 @@
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* 中央パネル：あの時のデザイン配置を再現 */
+    /* さらにパネルを大きく、威圧感を出す */
     #door-panel { 
       position: absolute; top: 50%; left: 50%; 
       transform: translate(-50%, -50%); 
       z-index: 10000; text-align: center; 
-      width: 320px; padding: 40px; 
-      background: rgba(0, 0, 0, 0.4); 
-      border: 3px double #d4af37;
-      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      width: 450px; padding: 60px; 
+      background: rgba(0, 0, 0, 0.6); 
+      border: 4px double #d4af37;
+      box-shadow: 0 0 50px rgba(0,0,0,0.9);
     }
     
-    /* 入力欄の細部調整 */
+    /* 入力欄をさらに強調 */
     #pass-input { 
-      width: 100%; padding: 18px; margin-bottom: 25px; 
-      background: #1a0b0d; border: 1px solid #d4af37; 
-      color: #d4af37; font-size: 1.4rem; text-align: center; 
-      box-sizing: border-box; letter-spacing: 2px;
+      width: 100%; padding: 25px; margin-bottom: 30px; 
+      background: #1a0b0d; border: 2px solid #d4af37; 
+      color: #d4af37; font-size: 1.8rem; text-align: center; 
+      box-sizing: border-box; letter-spacing: 3px;
     }
     
-    /* OPENボタンの質感 */
+    /* ボタンを極大化 */
     #enter-btn { 
-      width: 100%; padding: 18px; background: #290a0f; 
-      border: 2px solid #d4af37; color: #d4af37; 
-      font-size: 1.5rem; font-weight: bold; cursor: pointer; 
-      margin-bottom: 25px; transition: all 0.4s ease;
+      width: 100%; padding: 25px; background: #290a0f; 
+      border: 3px solid #d4af37; color: #d4af37; 
+      font-size: 2.0rem; font-weight: bold; cursor: pointer; 
+      margin-bottom: 30px; transition: all 0.4s ease;
     }
-    #enter-btn:hover { background: #d4af37; color: #1a0b0d; transform: scale(1.02); }
+    #enter-btn:hover { background: #d4af37; color: #1a0b0d; transform: scale(1.05); }
     
-    /* BGM操作ボタンの装飾 */
+    /* BGM操作ボタン */
     #bgm-toggle { 
-      width: 100%; padding: 12px; background: #4a0e17; 
-      border: 1px solid #d4af37; color: #d4af37; 
-      cursor: pointer; font-size: 1.1rem; transition: 0.3s;
+      width: 100%; padding: 20px; background: #4a0e17; 
+      border: 2px solid #d4af37; color: #d4af37; 
+      cursor: pointer; font-size: 1.4rem; transition: 0.3s;
     }
     #bgm-toggle:hover { background: #d4af37; color: #1a0b0d; }
   </style>
@@ -84,24 +82,16 @@
     const bgmStatus = document.getElementById('bgm-status');
     let bgmEnabled = false;
 
-    // BGMのON/OFF切り替えロジック
     function toggleBGM() {
       bgmEnabled = !bgmEnabled;
       bgmStatus.innerText = bgmEnabled ? "ON" : "OFF";
     }
 
-    // OPENボタン押下時の演出ロジック
     document.getElementById('enter-btn').addEventListener('click', () => {
-      const input = document.getElementById('pass-input').value;
-      if (input === "1234") {
-        // BGMがONならここで再生開始
-        if (bgmEnabled) {
-          bgm.play().catch(e => console.log("BGM playback restricted"));
-        }
-        // 扉を開くアニメーション
+      if (document.getElementById('pass-input').value === "1234") {
+        if (bgmEnabled) { bgm.play().catch(e => console.log("BGM restricted")); }
         overlay.classList.add('open');
       } else {
-        // パスワード失敗時のエフェクトも今後追加可能です
         alert('パスワードが違います');
       }
     });
