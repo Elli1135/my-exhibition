@@ -7,48 +7,34 @@
   <style>
     body { margin: 0; background: #1a0b0d; color: #d4af37; font-family: 'Yu Mincho', serif; }
     
-    /* 1. 中央の黄色いライン（すべての後ろに配置） */
-    .vertical-line { position: fixed; top: 0; left: 50%; width: 2px; height: 100%; background: #d4af37; z-index: 50; }
+    /* 1. 中央ライン：扉の合わせ目 */
+    .door-line { position: fixed; top: 0; left: 50%; width: 2px; height: 100%; background: #d4af37; z-index: 100; transform: translateX(-50%); }
 
     /* 看板タイトル */
-    .header-title { 
-      position: absolute; top: 30px; width: 100%; text-align: center; 
-      font-size: 1.5rem; letter-spacing: 0.2rem; z-index: 300;
-      border-bottom: 1px solid #d4af37; padding-bottom: 10px;
-    }
+    .header-title { position: absolute; top: 30px; width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 0.2rem; z-index: 300; border-bottom: 1px solid #d4af37; padding-bottom: 10px; }
 
-    /* 扉演出 */
-    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 100; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
+    /* 2. 扉演出 */
+    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
     .door { width: 50%; height: 100%; background: #4a0e17; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
     /* UIパネル */
-    #ui-panel { 
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-      width: 85%; max-width: 400px; text-align: center; z-index: 300;
-      background: rgba(41, 10, 15, 0.8);
-      border: 2px solid rgba(139, 0, 0, 0.8);
-      padding: 30px; border-radius: 10px;
-    }
+    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; z-index: 300; background: rgba(41, 10, 15, 0.8); border: 2px solid rgba(139, 0, 0, 0.8); padding: 30px; border-radius: 10px; }
     
     input { width: 100%; padding: 15px; margin-bottom: 20px; background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
-    .bgm-title { margin-bottom: 5px; font-size: 0.9rem; }
     .bgm-tab { display: flex; border: 1px solid #d4af37; border-radius: 50px; overflow: hidden; margin-bottom: 20px; }
     .tab-btn { flex: 1; padding: 10px; background: #290a0f; color: #d4af37; border: none; cursor: pointer; }
     .tab-btn.active { background: #d4af37; color: #1a0b0d; }
     #open-btn { width: 100%; padding: 15px; background: none; border: 2px solid #d4af37; color: #d4af37; font-weight: bold; cursor: pointer; }
 
+    /* 3. 独立した部屋の展示リスト */
     #gallery { display: none; padding: 100px 20px 40px; text-align: center; z-index: 400; position: relative; }
-    .work-container { max-width: 600px; margin: 40px auto; border: 1px solid #d4af37; padding: 20px; }
-    .slider { position: relative; width: 100%; height: 300px; background: #333; display: flex; align-items: center; justify-content: center; }
-    .dummy-img { width: 80%; height: 60%; background: #d4af37; display: none; }
-    .dummy-img.active { display: block; }
-    .nav-btn { position: absolute; top: 50%; cursor: pointer; background: rgba(0,0,0,0.5); color: white; border: none; padding: 10px; }
+    .room-card { display: inline-block; width: 150px; margin: 10px; padding: 20px; border: 1px solid #d4af37; background: #290a0f; cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="vertical-line"></div>
+  <div class="door-line"></div>
   <div class="header-title">アートクリエイター・児童文化部</div>
 
   <audio id="bgm" src="bgm.mp3" loop></audio>
@@ -60,7 +46,7 @@
 
   <div id="ui-panel">
     <input type="password" id="pass" placeholder="パスワード">
-    <div class="bgm-title">BGM</div>
+    <div style="margin-bottom:5px;">BGM</div>
     <div class="bgm-tab">
       <button id="bgm-on" class="tab-btn" onclick="setBGM(true)">ON</button>
       <button id="bgm-off" class="tab-btn active" onclick="setBGM(false)">OFF</button>
@@ -69,8 +55,8 @@
   </div>
 
   <div id="gallery">
-    <h1>作品展示室</h1>
-    <div id="display-area"></div>
+    <h1>展示室一覧</h1>
+    <div id="room-list"></div>
   </div>
 
   <script>
@@ -93,26 +79,11 @@
       } else { alert("パスワードが違います"); }
     }
 
-    const workData = {'a': [1, 2, 3, 4], 'b': [1], 'c': [1], 'd': [1], 'e': [1], 'f': [1], 'g': [1], 'h': [1], 'i': [1], 'j': [1]};
-    const displayArea = document.getElementById('display-area');
-    Object.keys(workData).forEach(name => {
-      displayArea.innerHTML += `
-        <div class="work-container">
-          <h3>${name.toUpperCase()}さんの作品</h3>
-          <div class="slider" id="slider-${name}">
-            ${workData[name].map((_, i) => `<div class="dummy-img ${i===0?'active':''}"></div>`).join('')}
-            ${workData[name].length > 1 ? `<button class="nav-btn" style="left:0" onclick="change('${name}', -1)">◀</button><button class="nav-btn" style="right:0" onclick="change('${name}', 1)">▶</button>` : ''}
-          </div>
-        </div>`;
+    const authors = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    const roomList = document.getElementById('room-list');
+    authors.forEach(name => {
+      roomList.innerHTML += `<div class="room-card" onclick="alert('${name}さんの展示室へ移動します')"><h3>${name}さん</h3></div>`;
     });
-
-    function change(name, dir) {
-      const imgs = document.querySelectorAll(`#slider-${name} .dummy-img`);
-      let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-      imgs[idx].classList.remove('active');
-      idx = (idx + dir + imgs.length) % imgs.length;
-      imgs[idx].classList.add('active');
-    }
   </script>
 </body>
 </html>
