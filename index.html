@@ -2,39 +2,66 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>アートクリエイター・児童文化部 個展</title>
+  <title>アートクリエイター・児童文化部 個展会場</title>
   <style>
-    body { margin: 0; background: #290a0f; color: #d4af37; font-family: 'Times New Roman', '游明朝', serif; overflow: hidden; }
-    
-    /* 扉の左右パネル */
-    #door-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: flex; transition: opacity 1.5s ease; background-color: #1a0b0d; }
-    .door { width: 50%; height: 100%; background: linear-gradient(to right, #4a0e17, #2b0409); border: 2px solid #d4af37; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
-    .door-left { transform: translateX(0); }
-    .door-right { transform: translateX(0); }
+    /* ページ全体：重厚な赤と黒のグラデーション */
+    body { 
+      margin: 0; padding: 0; 
+      background: radial-gradient(circle at 50% 50%, #4a0e17 0%, #290a0f 50%, #1a0b0d 100%); 
+      color: #d4af37; font-family: 'Times New Roman', '游明朝', serif; 
+      overflow: hidden; height: 100vh;
+    }
+
+    /* 扉の左右パネル：アニメーションの重みを演出 */
+    #door-overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      z-index: 9999; display: flex; transition: opacity 2.0s ease-in-out; 
+      background-color: #1a0b0d; 
+    }
+    .door { 
+      width: 50%; height: 100%; 
+      background: linear-gradient(to right, #4a0e17, #290a0f); 
+      border-left: 2px solid #d4af37; border-right: 2px solid #d4af37; 
+      transition: transform 3.0s cubic-bezier(0.65, 0, 0.35, 1); 
+    }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* パスワード入力とボタンの配置 */
+    /* 中央パネル：あの時のデザイン配置を再現 */
     #door-panel { 
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-      z-index: 10000; text-align: center; border: 3px double #d4af37; 
-      padding: 50px; background: rgba(0,0,0,0.7); width: 300px;
+      position: absolute; top: 50%; left: 50%; 
+      transform: translate(-50%, -50%); 
+      z-index: 10000; text-align: center; 
+      width: 320px; padding: 40px; 
+      background: rgba(0, 0, 0, 0.4); 
+      border: 3px double #d4af37;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
     }
+    
+    /* 入力欄の細部調整 */
     #pass-input { 
-      width: 100%; padding: 15px; margin-bottom: 20px; border: 2px solid #d4af37; 
-      background: #1a0b0d; color: #d4af37; font-size: 1.5rem; text-align: center; box-sizing: border-box;
+      width: 100%; padding: 18px; margin-bottom: 25px; 
+      background: #1a0b0d; border: 1px solid #d4af37; 
+      color: #d4af37; font-size: 1.4rem; text-align: center; 
+      box-sizing: border-box; letter-spacing: 2px;
     }
+    
+    /* OPENボタンの質感 */
     #enter-btn { 
-      display: block; width: 100%; padding: 15px; cursor: pointer; 
-      background: #d4af37; border: none; font-weight: bold; font-size: 1.2rem; color: #1a0b0d; margin-bottom: 20px;
+      width: 100%; padding: 18px; background: #290a0f; 
+      border: 2px solid #d4af37; color: #d4af37; 
+      font-size: 1.5rem; font-weight: bold; cursor: pointer; 
+      margin-bottom: 25px; transition: all 0.4s ease;
     }
-    /* BGMボタンをOPENの下へ移動 */
+    #enter-btn:hover { background: #d4af37; color: #1a0b0d; transform: scale(1.02); }
+    
+    /* BGM操作ボタンの装飾 */
     #bgm-toggle { 
-      width: 100%; padding: 10px; cursor: pointer; 
-      background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; font-size: 1rem;
+      width: 100%; padding: 12px; background: #4a0e17; 
+      border: 1px solid #d4af37; color: #d4af37; 
+      cursor: pointer; font-size: 1.1rem; transition: 0.3s;
     }
-
-    #gallery-body { display: none; padding: 40px; text-align: center; }
+    #bgm-toggle:hover { background: #d4af37; color: #1a0b0d; }
   </style>
 </head>
 <body>
@@ -44,42 +71,37 @@
   <div id="door-overlay">
     <div class="door door-left"></div>
     <div id="door-panel">
-      <input type="password" id="pass-input" placeholder="パスワード">
+      <input type="password" id="pass-input" placeholder="Password">
       <button id="enter-btn">OPEN</button>
       <button id="bgm-toggle" onclick="toggleBGM()">BGM: <span id="bgm-status">OFF</span></button>
     </div>
     <div class="door door-right"></div>
   </div>
 
-  <div id="gallery-body">
-    <h1>館内案内</h1>
-    </div>
-
   <script>
     const overlay = document.getElementById('door-overlay');
-    const gallery = document.getElementById('gallery-body');
     const bgm = document.getElementById('bgm');
     const bgmStatus = document.getElementById('bgm-status');
     let bgmEnabled = false;
 
-    // BGMのON/OFF切り替え
+    // BGMのON/OFF切り替えロジック
     function toggleBGM() {
       bgmEnabled = !bgmEnabled;
       bgmStatus.innerText = bgmEnabled ? "ON" : "OFF";
     }
 
-    // OPENボタン処理
+    // OPENボタン押下時の演出ロジック
     document.getElementById('enter-btn').addEventListener('click', () => {
-      if (document.getElementById('pass-input').value === "1234") {
-        // もしONなら音楽開始
-        if (bgmEnabled) { bgm.play(); }
-        
+      const input = document.getElementById('pass-input').value;
+      if (input === "1234") {
+        // BGMがONならここで再生開始
+        if (bgmEnabled) {
+          bgm.play().catch(e => console.log("BGM playback restricted"));
+        }
+        // 扉を開くアニメーション
         overlay.classList.add('open');
-        setTimeout(() => { 
-          overlay.style.display = 'none'; 
-          gallery.style.display = 'block'; 
-        }, 2500);
       } else {
+        // パスワード失敗時のエフェクトも今後追加可能です
         alert('パスワードが違います');
       }
     });
