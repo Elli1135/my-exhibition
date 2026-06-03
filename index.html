@@ -8,12 +8,13 @@
     body { margin: 0; background: #2e090f; color: #d4af37; font-family: 'Yu Mincho', serif; min-height: 100vh; }
     body.gallery-mode { background: #4a0e17; }
 
-    /* ヘッダー・線周り */
+    /* ヘッダー周り */
     .header-container { position: absolute; top: 30px; width: 100%; text-align: center; z-index: 300; }
-    .header-title { font-size: 1.2rem; letter-spacing: 0.1rem; margin-bottom: 10px; }
+    .header-title { font-size: 1.2rem; letter-spacing: 0.1rem; margin-bottom: 15px; }
     .horizontal-line { width: 80%; max-width: 400px; height: 1px; background: #d4af37; margin: 0 auto; }
-    /* 縦線：横線(76px付近)から下へ制限 */
-    .door-line { position: fixed; top: 76px; left: 50%; width: 2px; height: calc(100% - 76px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
+    
+    /* 縦線：横線の下(約85px)から開始するように固定 */
+    .door-line { position: fixed; top: 85px; left: 50%; width: 2px; height: calc(100% - 85px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
     
     #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #2e090f; pointer-events: none; }
     .door { width: 50%; height: 100%; background: #2e090f; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #d4af37; pointer-events: auto; }
@@ -33,7 +34,7 @@
     #gallery, #work-view { display: none; padding-top: 100px; text-align: center; position: relative; z-index: 400; }
     .room-card { display: block; width: 80%; max-width: 250px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; background: rgba(0,0,0,0.3); }
     
-    .slider-img { width: 80%; max-width: 400px; min-height: 200px; display: none; margin: 0 auto; border: 1px solid #d4af37; object-fit: contain; }
+    .slider-img { width: 80%; max-width: 400px; height: 300px; display: none; margin: 0 auto; border: 1px solid #d4af37; object-fit: contain; }
     .slider-img.active { display: block; }
     .nav-container { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 20px auto; }
     .nav-btn { cursor: pointer; background: none; border: 1px solid #d4af37; color: #d4af37; padding: 10px 20px; }
@@ -94,7 +95,7 @@
             document.querySelector('.header-container').style.display = 'none';
             document.getElementById('gallery').style.display = 'block'; 
         }, 1000);
-      } else { alert("パスワードが間違ってます！\nもう一度確認してください！"); }
+      } else { alert("パスワードが違います"); }
     }
 
     const authors = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -103,10 +104,10 @@
     });
 
     const aImages = [
-        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759684833382500/IMG_2966.jpg",
-        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759685232103494/IMG_2974.jpg",
-        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759685647077408/IMG_2984.jpg",
-        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759686133878855/IMG_2851.jpg"
+        "https://media.discordapp.net/attachments/1450904587304308817/1511759684833382500/IMG_2966.jpg",
+        "https://media.discordapp.com/attachments/1450904587304308817/1511759685232103494/IMG_2974.jpg",
+        "https://media.discordapp.com/attachments/1450904587304308817/1511759685647077408/IMG_2984.jpg",
+        "https://media.discordapp.com/attachments/1450904587304308817/1511759686133878855/IMG_2851.jpg"
     ];
 
     function openRoom(name) {
@@ -123,7 +124,6 @@
               const img = new Image();
               img.src = src;
               img.className = `slider-img ${i===0?'active':''}`;
-              img.onerror = function() { this.style.display = "none"; };
               area.appendChild(img);
           });
           updatePageInfo();
