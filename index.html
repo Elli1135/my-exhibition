@@ -2,83 +2,110 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>アートクリエイター・児童文化部 個展</title>
   <style>
     body { margin: 0; background: #2e090f; color: #d4af37; font-family: 'Yu Mincho', serif; min-height: 100vh; }
-    .header-container { text-align: center; padding-top: 30px; }
-    .horizontal-line { width: 80%; max-width: 400px; height: 1px; background: #d4af37; margin: 15px auto; }
-    .door-line { position: fixed; top: 85px; left: 50%; width: 2px; height: calc(100% - 85px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
     
-    #ui-panel, #gallery, #work-view { position: relative; z-index: 300; text-align: center; margin-top: 20px; }
-    #gallery, #work-view { display: none; }
-    .room-card { display: block; width: 80%; max-width: 250px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; }
+    /* ヘッダー */
+    header { text-align: center; padding: 30px 0; }
+    .title { font-size: 1.2rem; margin-bottom: 10px; }
+    .line { width: 80%; max-width: 400px; height: 1px; background: #d4af37; margin: 0 auto; }
+
+    /* コンテンツエリア */
+    #main-container { padding: 20px; text-align: center; }
+    .hidden { display: none; }
     
-    .slider-img { width: 80%; max-width: 400px; height: 300px; display: none; margin: 0 auto; border: 1px solid #d4af37; object-fit: contain; }
+    /* ボタン・カード */
+    .btn { display: block; width: 80%; max-width: 250px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; color: #d4af37; background: none; cursor: pointer; }
+    
+    /* 画像スライダー */
+    .slider-img { width: 90%; max-width: 500px; margin: 20px auto; border: 1px solid #d4af37; display: none; }
     .slider-img.active { display: block; }
-    .nav-btn { cursor: pointer; background: none; border: 1px solid #d4af37; color: #d4af37; padding: 10px 20px; margin: 10px; }
   </style>
 </head>
 <body>
-  <div class="header-container">
-    <div style="font-size: 1.2rem;">アートクリエイター・児童文化部</div>
-    <div class="horizontal-line"></div>
-  </div>
-  <div class="door-line"></div>
 
-  <div id="ui-panel">
-    <input type="password" id="pass" placeholder="パスワード">
-    <button onclick="enter()" style="display:block; margin: 10px auto; padding:10px;">OPEN</button>
-  </div>
+  <header>
+    <div class="title">アートクリエイター・児童文化部</div>
+    <div class="line"></div>
+  </header>
 
-  <div id="gallery">
-    <div id="room-list"></div>
-  </div>
+  <div id="main-container">
+    <div id="login-view">
+      <input type="password" id="pass" placeholder="パスワード" style="padding:10px; margin-bottom:10px;">
+      <button class="btn" onclick="checkPass()">ENTER</button>
+    </div>
 
-  <div id="work-view">
-    <h2 id="room-title" style="color:#d4af37;"></h2>
-    <div id="slider-area"></div>
-    <div id="nav-area"></div>
-    <button onclick="backToMenu()" style="margin-top:20px;">展示室一覧へ</button>
+    <div id="gallery-view" class="hidden">
+      <div id="room-list"></div>
+    </div>
+
+    <div id="work-view" class="hidden">
+      <h2 id="room-title"></h2>
+      <div id="slider"></div>
+      <div id="nav" style="margin-top:10px;"></div>
+      <button class="btn" onclick="showGallery()">一覧へ戻る</button>
+    </div>
   </div>
 
   <script>
-    // GitHubにアップロードしたファイル名に合わせてください
-    const galleryData = {
-        'A': ['image.png', 'image (1).png', 'image (2).png'], // 3枚
-        'B': ['image (3).png'] // 1枚
+    // ※アップロードしたファイル名と完全一致させてください
+    const rooms = {
+      'A': ['image.png', 'image (1).png', 'image (2).png'],
+      'B': ['image (3).png']
     };
 
-    function enter() {
+    let currentRoom = '';
+    let currentIdx = 0;
+
+    function checkPass() {
       if (document.getElementById('pass').value === "1234") {
-        document.getElementById('ui-panel').style.display = 'none'; 
-        document.getElementById('gallery').style.display = 'block'; 
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('gallery-view').classList.remove('hidden');
+        renderGallery();
       } else { alert("パスワードが違います"); }
     }
 
-    ['A','B','C','D','E','F','G','H','I','J'].forEach(name => {
-      document.getElementById('room-list').innerHTML += `<div class="room-card" onclick="openRoom('${name}')">${name}さんの展示室</div>`;
-    });
+    function renderGallery() {
+      const list = document.getElementById('room-list');
+      ['A','B','C','D','E','F','G','H','I','J'].forEach(name => {
+        list.innerHTML += `<button class="btn" onclick="openRoom('${name}')">${name}さんの展示室</button>`;
+      });
+    }
 
     function openRoom(name) {
-      document.getElementById('gallery').style.display = 'none';
-      document.getElementById('work-view').style.display = 'block';
+      currentRoom = name;
+      currentIdx = 0;
+      document.getElementById('gallery-view').classList.add('hidden');
+      document.getElementById('work-view').classList.remove('hidden');
       document.getElementById('room-title').innerText = name + 'さんの作品';
-      const area = document.getElementById('slider-area');
-      area.innerHTML = '';
+      updateSlider();
+    }
+
+    function updateSlider() {
+      const area = document.getElementById('slider');
+      const nav = document.getElementById('nav');
+      const imgs = rooms[currentRoom] || [];
       
-      const images = galleryData[name] || [];
-      if(images.length > 0) {
-          images.forEach((src, i) => {
-              area.innerHTML += `<img src="${src}" class="slider-img ${i===0?'active':''}">`;
-          });
+      if(imgs.length === 0) {
+        area.innerHTML = "<p>準備中です</p>";
+        nav.innerHTML = "";
       } else {
-          area.innerHTML = '<p>準備中です</p>';
+        area.innerHTML = `<img src="${imgs[currentIdx]}" class="slider-img active">`;
+        nav.innerHTML = `<button onclick="move(-1)">◀</button> <span>${currentIdx+1}/${imgs.length}</span> <button onclick="move(1)">▶</button>`;
       }
     }
 
-    function backToMenu() {
-      document.getElementById('work-view').style.display = 'none';
-      document.getElementById('gallery').style.display = 'block';
+    function move(dir) {
+      const imgs = rooms[currentRoom];
+      currentIdx = (currentIdx + dir + imgs.length) % imgs.length;
+      updateSlider();
+    }
+
+    function showGallery() {
+      document.getElementById('work-view').classList.add('hidden');
+      document.getElementById('gallery-view').classList.remove('hidden');
     }
   </script>
 </body>
