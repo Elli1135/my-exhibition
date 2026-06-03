@@ -2,26 +2,34 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>アートクリエイター・児童文化部 個展</title>
   <style>
     body { margin: 0; background: #2e090f; color: #d4af37; font-family: 'Yu Mincho', serif; min-height: 100vh; }
-    
-    /* ヘッダー周り */
-    .header-container { text-align: center; padding-top: 30px; }
+    body.gallery-mode { background: #4a0e17; }
+
+    .header-container { text-align: center; padding-top: 30px; position: relative; z-index: 300; }
     .header-title { font-size: 1.2rem; letter-spacing: 0.1rem; margin-bottom: 15px; }
     .horizontal-line { width: 80%; max-width: 400px; height: 1px; background: #d4af37; margin: 0 auto; }
     
-    /* 縦線 */
-    .door-line { position: fixed; top: 85px; left: 50%; width: 2px; height: calc(100% - 85px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
+    /* 修正：線を横線より下から描画 */
+    .door-line { position: absolute; top: 76px; left: 50%; width: 2px; height: calc(100vh - 76px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
     
-    /* パネル・UI */
-    #ui-panel, #gallery, #work-view { position: relative; z-index: 300; text-align: center; padding-top: 50px; }
-    #gallery, #work-view { display: none; }
+    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #2e090f; pointer-events: none; }
+    .door { width: 50%; height: 100%; background: #2e090f; border: 1px solid #d4af37; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    #door-overlay.open .door-left { transform: translateX(-100%); }
+    #door-overlay.open .door-right { transform: translateX(100%); }
+    
+    #ui-panel { position: relative; top: 50px; width: 80%; max-width: 300px; margin: 0 auto; text-align: center; z-index: 300; }
+    input { width: 100%; padding: 12px; margin-bottom: 20px; background: #1a0508; border: 1px solid #d4af37; color: #d4af37; text-align: center; }
+    
+    #gallery, #work-view { display: none; padding-top: 50px; text-align: center; position: relative; z-index: 400; }
     .room-card { display: block; width: 80%; max-width: 250px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; background: rgba(0,0,0,0.3); }
     
-    /* 画像スライダー */
-    .slider-img { width: 80%; max-width: 400px; height: 300px; display: none; margin: 0 auto; border: 1px solid #d4af37; object-fit: contain; }
+    .slider-img { width: 80%; max-width: 400px; display: none; margin: 0 auto; border: 1px solid #d4af37; }
     .slider-img.active { display: block; }
+    .nav-container { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 20px auto; }
+    .nav-btn { cursor: pointer; background: none; border: 1px solid #d4af37; color: #d4af37; padding: 10px 20px; }
   </style>
 </head>
 <body>
@@ -31,9 +39,14 @@
   </div>
   <div class="door-line"></div>
 
+  <div id="door-overlay">
+    <div class="door door-left"></div>
+    <div class="door door-right"></div>
+  </div>
+
   <div id="ui-panel">
     <input type="password" id="pass" placeholder="パスワード">
-    <button onclick="enter()" style="display:block; margin: 10px auto; padding:10px;">OPEN</button>
+    <button id="open-btn" onclick="enter()" style="width:100%; padding:12px; border:1px solid #d4af37; background:none; color:#d4af37; cursor:pointer;">OPEN</button>
   </div>
 
   <div id="gallery">
@@ -43,27 +56,42 @@
   <div id="work-view">
     <h2 id="room-title" style="color:#d4af37;"></h2>
     <div id="slider-area"></div>
-    <div id="nav-area" style="margin-top:20px;"></div>
-    <button onclick="backToMenu()" style="margin-top:20px;">展示室一覧へ</button>
+    <div class="nav-container">
+        <button class="nav-btn" onclick="move(-1)">◀</button>
+        <span id="page-info" style="color:#d4af37;"></span>
+        <button class="nav-btn" onclick="move(1)">▶</button>
+    </div>
+    <button onclick="backToMenu()" style="margin-top:20px; background:none; border:1px solid #d4af37; color:#d4af37; padding:10px;">展示室一覧へ</button>
   </div>
 
   <script>
-    // GitHubにアップロードしたファイル名と一致させてください
-    const galleryData = {
-        'A': ['image.png', 'image (1).png', 'image (2).png'],
-        'B': ['image (3).png']
-    };
-
     function enter() {
       if (document.getElementById('pass').value === "1234") {
-        document.getElementById('ui-panel').style.display = 'none'; 
-        document.getElementById('gallery').style.display = 'block'; 
+        document.getElementById('door-overlay').classList.add('open');
+        document.body.classList.add('gallery-mode');
+        setTimeout(() => { 
+            document.getElementById('ui-panel').style.display = 'none'; 
+            document.querySelector('.header-container').style.display = 'none';
+            document.getElementById('gallery').style.display = 'block'; 
+        }, 1000);
       } else { alert("パスワードが違います"); }
     }
+    
+    // Aさんの画像パス（Discord直接リンクはブロックされる可能性が高いため注意）
+    const aImages = [
+        "https://media.discordapp.net/attachments/1450904587304308817/1511759684833382500/IMG_2966.jpg",
+        "https://media.discordapp.com/attachments/1450904587304308817/1511759685232103494/IMG_2974.jpg",
+        "https://media.discordapp.com/attachments/1450904587304308817/1511759685647077408/IMG_2984.jpg",
+        "https://media.discordapp.com/attachments/1450904587304308817/1511759686133878855/IMG_2851.jpg"
+    ];
 
-    ['A','B','C','D','E','F','G','H','I','J'].forEach(name => {
+    const authors = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    authors.forEach(name => {
       document.getElementById('room-list').innerHTML += `<div class="room-card" onclick="openRoom('${name}')">${name}さんの展示室</div>`;
     });
+
+    let currentIdx = 0;
+    let currentImgs = [];
 
     function openRoom(name) {
       document.getElementById('gallery').style.display = 'none';
@@ -71,15 +99,27 @@
       document.getElementById('room-title').innerText = name + 'さんの作品';
       const area = document.getElementById('slider-area');
       area.innerHTML = '';
-      
-      const imgs = galleryData[name] || [];
-      if(imgs.length > 0) {
-          imgs.forEach((src, i) => {
-              area.innerHTML += `<img src="${src}" class="slider-img ${i===0?'active':''}">`;
+      currentIdx = 0;
+
+      if(name === 'A') {
+          currentImgs = aImages;
+          currentImgs.forEach((src, i) => {
+              const img = document.createElement('img');
+              img.src = src;
+              img.className = `slider-img ${i===0?'active':''}`;
+              area.appendChild(img);
           });
-      } else {
-          area.innerHTML = '<p style="color:#d4af37;">準備中です</p>';
+          document.getElementById('page-info').innerText = "1 / " + currentImgs.length;
       }
+    }
+
+    function move(dir) {
+      const imgs = document.querySelectorAll('.slider-img');
+      if (imgs.length === 0) return;
+      imgs[currentIdx].classList.remove('active');
+      currentIdx = (currentIdx + dir + imgs.length) % imgs.length;
+      imgs[currentIdx].classList.add('active');
+      document.getElementById('page-info').innerText = (currentIdx + 1) + " / " + imgs.length;
     }
 
     function backToMenu() {
