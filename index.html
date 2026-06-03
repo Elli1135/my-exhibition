@@ -9,11 +9,11 @@
     body.gallery-mode { background: #4a0e17; }
 
     /* ヘッダー周り */
-    .header-container { position: absolute; top: 30px; width: 100%; text-align: center; z-index: 300; }
+    .header-container { text-align: center; padding-top: 30px; }
     .header-title { font-size: 1.2rem; letter-spacing: 0.1rem; margin-bottom: 15px; }
     .horizontal-line { width: 80%; max-width: 400px; height: 1px; background: #d4af37; margin: 0 auto; }
     
-    /* 縦線：横線の下(約85px)から開始するように固定 */
+    /* 縦線：横線(85px付近)から下へ制限 */
     .door-line { position: fixed; top: 85px; left: 50%; width: 2px; height: calc(100% - 85px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
     
     #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #2e090f; pointer-events: none; }
@@ -21,7 +21,7 @@
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    #ui-panel { position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 300px; text-align: center; z-index: 300; }
+    #ui-panel { position: relative; top: 50px; width: 80%; max-width: 300px; margin: 0 auto; text-align: center; z-index: 300; }
     input { width: 100%; padding: 12px; margin-bottom: 20px; background: #1a0508; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
     
     .bgm-label { margin-bottom: 5px; font-size: 0.9rem; }
@@ -31,7 +31,7 @@
     
     #open-btn { width: 100%; padding: 12px; border: 1px solid #d4af37; background: none; color: #d4af37; cursor: pointer; }
 
-    #gallery, #work-view { display: none; padding-top: 100px; text-align: center; position: relative; z-index: 400; }
+    #gallery, #work-view { display: none; padding-top: 50px; text-align: center; position: relative; z-index: 400; }
     .room-card { display: block; width: 80%; max-width: 250px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; background: rgba(0,0,0,0.3); }
     
     .slider-img { width: 80%; max-width: 400px; height: 300px; display: none; margin: 0 auto; border: 1px solid #d4af37; object-fit: contain; }
@@ -41,7 +41,7 @@
   </style>
 </head>
 <body>
-  <div class="header-container">
+  <div class="header-container" id="header">
     <div class="header-title">アートクリエイター・児童文化部</div>
     <div class="horizontal-line"></div>
   </div>
@@ -92,7 +92,7 @@
         document.body.classList.add('gallery-mode');
         setTimeout(() => { 
             document.getElementById('ui-panel').style.display = 'none'; 
-            document.querySelector('.header-container').style.display = 'none';
+            document.getElementById('header').style.display = 'none';
             document.getElementById('gallery').style.display = 'block'; 
         }, 1000);
       } else { alert("パスワードが違います"); }
@@ -103,12 +103,8 @@
       document.getElementById('room-list').innerHTML += `<div class="room-card" onclick="openRoom('${name}')">${name}さんの展示室</div>`;
     });
 
-    const aImages = [
-        "https://media.discordapp.net/attachments/1450904587304308817/1511759684833382500/IMG_2966.jpg",
-        "https://media.discordapp.com/attachments/1450904587304308817/1511759685232103494/IMG_2974.jpg",
-        "https://media.discordapp.com/attachments/1450904587304308817/1511759685647077408/IMG_2984.jpg",
-        "https://media.discordapp.com/attachments/1450904587304308817/1511759686133878855/IMG_2851.jpg"
-    ];
+    // ここを実際のファイル名に合わせてください！
+    const aImages = ["IMG_2966.jpg", "IMG_2974.jpg", "IMG_2984.jpg", "IMG_2851.jpg"];
 
     function openRoom(name) {
       document.getElementById('gallery').style.display = 'none';
@@ -121,16 +117,14 @@
       if(name === 'A') {
           currentImgs = aImages;
           currentImgs.forEach((src, i) => {
-              const img = new Image();
+              const img = document.createElement('img');
               img.src = src;
               img.className = `slider-img ${i===0?'active':''}`;
               area.appendChild(img);
           });
-          updatePageInfo();
+          document.getElementById('page-info').innerText = "1 / " + currentImgs.length;
       } else {
-          currentImgs = [];
           area.innerHTML = '<p style="color:#d4af37;">準備中です</p>';
-          document.getElementById('page-info').innerText = '';
       }
     }
 
@@ -140,11 +134,7 @@
       imgs[currentIdx].classList.remove('active');
       currentIdx = (currentIdx + dir + currentImgs.length) % currentImgs.length;
       imgs[currentIdx].classList.add('active');
-      updatePageInfo();
-    }
-
-    function updatePageInfo() {
-      document.getElementById('page-info').innerText = (currentIdx + 1) + ' / ' + currentImgs.length;
+      document.getElementById('page-info').innerText = (currentIdx + 1) + " / " + currentImgs.length;
     }
 
     function backToMenu() {
