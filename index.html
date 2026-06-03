@@ -7,14 +7,18 @@
   <style>
     body { margin: 0; background: #290a0f; color: #d4af37; font-family: 'Yu Mincho', serif; }
     
-    /* 扉演出 */
-    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 999; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
+    /* 扉演出：z-indexを下げ、他の要素の後ろで開くようにする */
+    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 500; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
     .door { width: 50%; height: 100%; background: #4a0e17; border-left: 2px solid #d4af37; border-right: 2px solid #d4af37; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; }
+    /* パネルを最前面へ */
+    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; z-index: 1000; }
     input { width: 100%; padding: 15px; margin-bottom: 20px; background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
+    
+    /* BGM見出しとボタン */
+    .bgm-title { margin-bottom: 5px; font-size: 0.9rem; }
     .bgm-tab { display: flex; border: 1px solid #d4af37; border-radius: 50px; overflow: hidden; margin-bottom: 20px; }
     .tab-btn { flex: 1; padding: 10px; background: #290a0f; color: #d4af37; border: none; cursor: pointer; }
     .tab-btn.active { background: #d4af37; color: #1a0b0d; }
@@ -34,15 +38,17 @@
 
   <div id="door-overlay">
     <div class="door door-left"></div>
-    <div id="ui-panel">
-      <input type="password" id="pass" placeholder="パスワード">
-      <div class="bgm-tab">
-        <button id="bgm-on" class="tab-btn" onclick="setBGM(true)">BGM ON</button>
-        <button id="bgm-mute" class="tab-btn active" onclick="setBGM(false)">MUTE</button>
-      </div>
-      <button id="open-btn" onclick="enter()">OPEN</button>
-    </div>
     <div class="door door-right"></div>
+  </div>
+
+  <div id="ui-panel">
+    <input type="password" id="pass" placeholder="パスワード">
+    <div class="bgm-title">BGM</div>
+    <div class="bgm-tab">
+      <button id="bgm-on" class="tab-btn" onclick="setBGM(true)">ON</button>
+      <button id="bgm-off" class="tab-btn active" onclick="setBGM(false)">OFF</button>
+    </div>
+    <button id="open-btn" onclick="enter()">OPEN</button>
   </div>
 
   <div id="gallery">
@@ -53,21 +59,21 @@
   <script>
     let bgmEnabled = false;
     const workData = {
-      'a': [1, 2, 3, 4], // 4枚
+      'a': [1, 2, 3, 4], 
       'b': [1], 'c': [1], 'd': [1], 'e': [1], 'f': [1], 'g': [1], 'h': [1], 'i': [1], 'j': [1]
     };
 
     function setBGM(state) {
       bgmEnabled = state;
       document.getElementById('bgm-on').className = state ? 'tab-btn active' : 'tab-btn';
-      document.getElementById('bgm-mute').className = !state ? 'tab-btn active' : 'tab-btn';
+      document.getElementById('bgm-off').className = !state ? 'tab-btn active' : 'tab-btn';
     }
 
     function enter() {
       if (document.getElementById('pass').value === "1234") {
         if (bgmEnabled) document.getElementById('bgm').play();
         document.getElementById('door-overlay').classList.add('open');
-        setTimeout(() => { document.getElementById('gallery').style.display = 'block'; }, 1000);
+        setTimeout(() => { document.getElementById('gallery').style.display = 'block'; document.getElementById('ui-panel').style.display = 'none'; }, 1000);
       } else { alert("パスワードが違います"); }
     }
 
