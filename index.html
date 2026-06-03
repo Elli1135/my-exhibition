@@ -72,51 +72,36 @@
     </div>
   </div>
 
-    const overlay = document.getElementById('door-overlay');
-    const gallery = document.getElementById('gallery-body');
-    
-    // 最初はギャラリーを隠す
-    gallery.style.display = 'none';
+   const overlay = document.getElementById('door-overlay');
+  const gallery = document.getElementById('gallery-body');
+  
+  // 最初はギャラリーを隠す
+  gallery.style.display = 'none';
 
-    document.getElementById('enter-btn').addEventListener('click', () => {
-      const pass = document.getElementById('pass-input').value;
-      if (pass === "1234") { 
-        // 扉を開くアニメーション
-        document.getElementById('door-panel').style.opacity = '0';
-        overlay.classList.add('open');
-        
-        // 1.2秒後に扉を消して、ギャラリーを出す
-        setTimeout(() => { 
-          overlay.style.display = 'none'; 
-          gallery.style.display = 'block'; 
-        }, 1200);
-      } else {
-        alert('パスワードが違います！');
-      }
-    });
+  document.getElementById('enter-btn').addEventListener('click', () => {
+    const pass = document.getElementById('pass-input').value;
+    if (pass === "1234") { 
+      // 扉を開くアニメーション
+      document.getElementById('door-panel').style.opacity = '0';
+      overlay.classList.add('open');
+      
+      // 1.2秒後に扉を消して、ギャラリーを出す
+      setTimeout(() => { 
+        overlay.style.display = 'none'; 
+        gallery.style.display = 'block'; 
+      }, 1200);
+    } else {
+      alert('パスワードが違います！');
+    }
+  });
 
-        // 扉を開く
-        document.getElementById('door-panel').style.opacity = '0';
-        overlay.classList.add('open');
-        
-        setTimeout(() => { 
-          overlay.style.display = 'none'; // 扉を完全に消す
-          gallery.style.display = 'block'; // 中身を表示する！
-        }, 1200);
-      } else {
-        alert('パスワードが違います！');
-      }
-    });
-
-
-    const roomsData = {
-      "1": ["https://picsum.photos/id/10/600/900"], "2": ["https://picsum.photos/id/12/600/600"],
-      "3": ["https://picsum.photos/id/14/600/900"], "4": ["https://picsum.photos/id/15/600/900"],
-      "5": ["https://picsum.photos/id/16/600/900"], "6": ["https://picsum.photos/id/17/600/900"],
-      "7": ["https://picsum.photos/id/18/600/900"], "8": ["https://picsum.photos/id/19/600/900"],
-      "9": ["https://picsum.photos/id/20/600/900"], "10": ["https://picsum.photos/id/21/600/900"]
-    };
-    // （※ここに元のscriptの続きを貼り付けてもOKです！）
-  </script>
+  const roomsData = {
+    "1": ["https://picsum.photos/id/10/600/900"], "2": ["https://picsum.photos/id/12/600/600"],
+    "3": ["https://picsum.photos/id/14/600/900"], "4": ["https://picsum.photos/id/15/600/900"],
+    "5": ["https://picsum.photos/id/16/600/900"], "6": ["https://picsum.photos/id/17/600/900"],
+    "7": ["https://picsum.photos/id/18/600/900"], "8": ["https://picsum.photos/id/19/600/900"],
+    "9": ["https://picsum.photos/id/20/600/900"], "10": ["https://picsum.photos/id/21/600/900"]
+  };
+</script>
 </body>
 </html>
