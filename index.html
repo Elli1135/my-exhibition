@@ -2,23 +2,23 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>アートクリエイター・児童文化部へようこそ！</title>
+  <title>アートクリエイター・児童文化部 個展</title>
   <style>
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, #7a1f29 0%, #4a0e17 50%, #2b0409 100%); color: #d4af37; font-family: 'Times New Roman', Georgia, '游明朝', serif; overflow: hidden; }
-    #door-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1a0b0d; transition: opacity 1.2s; }
-    #gallery-body { display: none; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; text-align: center; }
-    #image-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; }
+    body { margin: 0; background: #290a0f; color: #d4af37; font-family: serif; overflow: hidden; }
+    /* 扉のデザイン */
+    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 999; display: flex; align-items: center; justify-content: center; background: #1a0b0d; transition: opacity 1.2s; }
+    .door { width: 50%; height: 100%; background: #4a0e17; border: 2px solid #d4af37; transition: transform 1s; }
+    .door-left { transform: translateX(0); }
+    .door-right { transform: translateX(0); }
+    #door-overlay.open .door-left { transform: translateX(-100%); }
+    #door-overlay.open .door-right { transform: translateX(100%); }
     
-    .auth-box { border: 2px solid #d4af37; padding: 30px; border-radius: 10px; background: rgba(0,0,0,0.5); text-align: center; }
-    #pass-input { padding: 12px; border-radius: 5px; border: 1px solid #d4af37; background: #1a0b0d; color: white; }
-    #enter-btn { padding: 12px 30px; cursor: pointer; background: #d4af37; border: none; border-radius: 5px; font-weight: bold; color: #1a0b0d; }
+    /* ギャラリーのデザイン */
+    #gallery-body { display: none; padding: 20px; text-align: center; }
+    .author-row { margin: 10px auto; padding: 10px; width: 300px; border: 1px solid #d4af37; display: flex; justify-content: space-between; align-items: center; }
+    .author-btn { cursor: pointer; background: none; border: none; color: #d4af37; font-size: 1.2rem; }
     
-    .button-list { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 20px; }
-    .author-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 360px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 6px; padding: 10px; }
-    .author-btn { background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; padding: 8px; cursor: pointer; border-radius: 4px; }
-    
-    #bgm-toggle { position: absolute; top: 10px; right: 10px; z-index: 2000; background: none; border: 1px solid #d4af37; color: #d4af37; padding: 5px 10px; cursor: pointer; }
+    #bgm-toggle { position: fixed; top: 10px; right: 10px; cursor: pointer; z-index: 2000; }
   </style>
 </head>
 <body>
@@ -27,48 +27,37 @@
   <audio id="bgm" loop><source src="bgm.mp3" type="audio/mpeg"></audio>
 
   <div id="door-overlay">
-    <div class="auth-box">
-      <input type="password" id="pass-input" placeholder="パスワードを入力">
+    <div class="door door-left"></div>
+    <div style="position:absolute; z-index:1000; text-align:center;">
+      <input type="password" id="pass-input" placeholder="パスワード">
       <button id="enter-btn">OPEN</button>
     </div>
+    <div class="door door-right"></div>
   </div>
 
   <div id="gallery-body">
-    <h2>館内案内</h2>
+    <h1>館内案内</h1>
     <div class="button-list">
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/10/600/900')">ルーム 1 ➔</button><div>待ちなし！</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/12/600/900')">ルーム 2 ➔</button><div>15分待ち</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/14/600/900')">ルーム 3 ➔</button><div>40分待ち</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/15/600/900')">ルーム 4 ➔</button><div>即行ける！</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/16/600/900')">ルーム 5 ➔</button><div>即行ける！</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/17/600/900')">ルーム 6 ➔</button><div>即行ける！</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/18/600/900')">ルーム 7 ➔</button><div>即行ける！</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/19/600/900')">ルーム 8 ➔</button><div>即行ける！</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/20/600/900')">ルーム 9 ➔</button><div>即行ける！</div></div>
-      <div class="author-row"><button class="author-btn" onclick="showImage('https://picsum.photos/id/21/600/900')">ルーム 10 ➔</button><div>即行ける！</div></div>
-    </div>
-  </div>
-
-  <div id="image-viewer" onclick="this.style.display='none'">
-    <img id="display-img" src="" style="max-width:90%; max-height:90%;">
+      <div class="author-row"><button class="author-btn" onclick="alert('画像を表示します')">ルーム 1</button><span>待ちなし</span></div>
+      </div>
   </div>
 
   <script>
     const overlay = document.getElementById('door-overlay');
     const gallery = document.getElementById('gallery-body');
-    const viewer = document.getElementById('image-viewer');
-    const displayImg = document.getElementById('display-img');
     const bgm = document.getElementById('bgm');
 
     document.getElementById('enter-btn').addEventListener('click', () => {
       if (document.getElementById('pass-input').value === "1234") {
-        overlay.style.opacity = '0';
-        setTimeout(() => { overlay.style.display = 'none'; gallery.style.display = 'block'; }, 1200);
-      } else { alert('パスワードが違います！'); }
+        overlay.classList.add('open');
+        setTimeout(() => { 
+          overlay.style.display = 'none'; 
+          gallery.style.display = 'block'; 
+        }, 1200);
+      } else { alert('パスワードが違います'); }
     });
 
-    function toggleBGM() { if (bgm.paused) { bgm.play(); } else { bgm.pause(); } }
-    function showImage(url) { displayImg.src = url; viewer.style.display = 'flex'; }
+    function toggleBGM() { bgm.paused ? bgm.play() : bgm.pause(); }
   </script>
 </body>
 </html>
