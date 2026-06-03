@@ -5,25 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>アートクリエイター・児童文化部 個展</title>
   <style>
-    /* 全体のベース背景（パスワード画面用） */
-    body { margin: 0; background: #1a0b0d; color: #d4af37; font-family: 'Yu Mincho', serif; min-height: 100vh; }
+    /* 背景色をワイン色に統一 */
+    body { margin: 0; background: #4a0e17; color: #d4af37; font-family: 'Yu Mincho', serif; min-height: 100vh; }
     
-    /* 修正：展示室用の背景（扉が開いた後の背景） */
-    body.gallery-mode { 
-      background: linear-gradient(to bottom, #9b2a3a 0%, #4a0e17 50%, #1a0b0d 100%); 
-    }
-
     .door-line { position: fixed; top: 0; left: 50%; width: 2px; height: 100%; background: #d4af37; z-index: 100; transform: translateX(-50%); }
     .header-title { position: absolute; top: 30px; width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 0.2rem; z-index: 300; border-bottom: 1px solid #d4af37; padding-bottom: 10px; }
     
-    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
-    .door { width: 50%; height: 100%; background: #4a0e17; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #4a0e17; }
+    .door { width: 50%; height: 100%; background: #4a0e17; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #d4af37; }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* パスワード画面のデザイン（そのまま） */
-    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; z-index: 300; background: rgba(41, 10, 15, 0.8); border: 2px solid rgba(139, 0, 0, 0.8); padding: 30px; border-radius: 10px; }
-    input { width: 100%; padding: 15px; margin-bottom: 20px; background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
+    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; z-index: 300; background: rgba(0,0,0,0.3); border: 2px solid #d4af37; padding: 30px; border-radius: 10px; }
+    input { width: 100%; padding: 15px; margin-bottom: 20px; background: #290a0f; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
     
     .bgm-tab { display: flex; border: 1px solid #d4af37; border-radius: 50px; overflow: hidden; margin-bottom: 20px; }
     .tab-btn { flex: 1; padding: 10px; background: #290a0f; color: #d4af37; border: none; cursor: pointer; }
@@ -31,15 +25,18 @@
     #open-btn { width: 100%; padding: 15px; background: none; border: 2px solid #d4af37; color: #d4af37; font-weight: bold; cursor: pointer; }
 
     #gallery { display: none; padding: 100px 20px 40px; text-align: center; z-index: 400; position: relative; }
-    .room-card { display: block; width: 200px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; background: rgba(41, 10, 15, 0.5); color: #d4af37; cursor: pointer; text-decoration: none; }
+    .room-card { display: block; width: 200px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; background: rgba(0,0,0,0.3); color: #d4af37; cursor: pointer; }
+    
     #work-view { display: none; padding: 20px; text-align: center; position: relative; z-index: 400; }
+    .slider { position: relative; max-width: 500px; margin: 0 auto; height: 400px; }
+    .slider img { width: 100%; height: 100%; object-fit: contain; display: none; }
+    .slider img.active { display: block; }
+    .nav-btn { position: absolute; top: 50%; cursor: pointer; background: #d4af37; color: #4a0e17; border: none; padding: 10px; }
   </style>
 </head>
 <body>
   <div class="door-line"></div>
   <div class="header-title">アートクリエイター・児童文化部</div>
-
-  <audio id="bgm" src="bgm.mp3" loop></audio>
 
   <div id="door-overlay">
     <div class="door door-left"></div>
@@ -48,11 +45,6 @@
 
   <div id="ui-panel">
     <input type="password" id="pass" placeholder="パスワード">
-    <div style="margin-bottom:5px; color:#d4af37;">BGM</div>
-    <div class="bgm-tab">
-      <button id="bgm-on" class="tab-btn" onclick="setBGM(true)">ON</button>
-      <button id="bgm-off" class="tab-btn active" onclick="setBGM(false)">OFF</button>
-    </div>
     <button id="open-btn" onclick="enter()">OPEN</button>
   </div>
 
@@ -63,33 +55,20 @@
 
   <div id="work-view">
     <h2 id="room-title" style="color:#d4af37;"></h2>
-    <div id="slider"></div>
+    <div class="slider" id="slider"></div>
     <button onclick="backToMenu()" style="margin-top:20px; background:none; border:1px solid #d4af37; color:#d4af37; padding:10px;">展示室一覧へ</button>
   </div>
 
   <script>
-    let bgmEnabled = false;
-    function setBGM(state) {
-      bgmEnabled = state;
-      document.getElementById('bgm-on').className = state ? 'tab-btn active' : 'tab-btn';
-      document.getElementById('bgm-off').className = !state ? 'tab-btn active' : 'tab-btn';
-    }
-
     function enter() {
       if (document.getElementById('pass').value === "1234") {
-        if (bgmEnabled) document.getElementById('bgm').play();
         document.getElementById('door-overlay').classList.add('open');
-        // 背景を展示室用に切り替える
-        document.body.classList.add('gallery-mode');
-        
         setTimeout(() => { 
             document.getElementById('ui-panel').style.display = 'none'; 
             document.querySelector('.header-title').style.display = 'none';
             document.getElementById('gallery').style.display = 'block'; 
         }, 1000);
-      } else { 
-        alert("パスワードが間違ってます！\nもう一度確認してください！"); 
-      }
+      } else { alert("パスワードが間違ってます！\nもう一度確認してください！"); }
     }
 
     const authors = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
@@ -98,10 +77,37 @@
       roomList.innerHTML += `<div class="room-card" onclick="openRoom('${name}')">${name}さんの展示室</div>`;
     });
 
+    const aImages = [
+        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759684833382500/IMG_2966.jpg",
+        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759685232103494/IMG_2974.jpg",
+        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759685647077408/IMG_2984.jpg",
+        "https://cdn.discordapp.com/attachments/1450904587304308817/1511759686133878855/IMG_2851.jpg"
+    ];
+
     function openRoom(name) {
       document.getElementById('gallery').style.display = 'none';
       document.getElementById('work-view').style.display = 'block';
       document.getElementById('room-title').innerText = name + 'さんの作品';
+      
+      const slider = document.getElementById('slider');
+      slider.innerHTML = '';
+      
+      if(name === 'A') {
+          aImages.forEach((src, i) => {
+              slider.innerHTML += `<img src="${src}" class="${i===0?'active':''}">`;
+          });
+          slider.innerHTML += `<button class="nav-btn" style="left:0" onclick="move(-1)">◀</button><button class="nav-btn" style="right:0" onclick="move(1)">▶</button>`;
+      } else {
+          slider.innerHTML = '<p>準備中です</p>';
+      }
+    }
+
+    function move(dir) {
+      const imgs = document.querySelectorAll('#slider img');
+      let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+      imgs[idx].classList.remove('active');
+      idx = (idx + dir + imgs.length) % imgs.length;
+      imgs[idx].classList.add('active');
     }
 
     function backToMenu() {
