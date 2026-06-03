@@ -5,24 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>アートクリエイター・児童文化部 個展</title>
   <style>
-    /* アニメーション前：濃い赤色 */
     body { margin: 0; background: #2e090f; color: #d4af37; font-family: 'Yu Mincho', serif; min-height: 100vh; }
-    /* アニメーション後：ワイン色 */
     body.gallery-mode { background: #4a0e17; }
 
-    /* タイトルと線：タイトル下の余白を確保し、線を重ならないように調整 */
-    .header-title { position: absolute; top: 30px; width: 100%; text-align: center; font-size: 1.2rem; letter-spacing: 0.1rem; z-index: 300; }
-    .door-line { position: fixed; top: 70px; left: 50%; width: 2px; height: calc(100% - 70px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
+    /* ヘッダーと境界線の調整 */
+    .header-container { position: absolute; top: 30px; width: 100%; text-align: center; z-index: 300; }
+    .header-title { font-size: 1.2rem; letter-spacing: 0.1rem; margin-bottom: 10px; }
+    .horizontal-line { width: 80%; max-width: 400px; height: 1px; background: #d4af37; margin: 0 auto; }
+    
+    /* 縦線：横線の中央から下へ伸びる */
+    .door-line { position: fixed; top: 75px; left: 50%; width: 2px; height: calc(100% - 75px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
     
     #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #2e090f; pointer-events: none; }
     .door { width: 50%; height: 100%; background: #2e090f; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #d4af37; pointer-events: auto; }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    #ui-panel { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 300px; text-align: center; z-index: 300; }
+    #ui-panel { position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 300px; text-align: center; z-index: 300; }
     input { width: 100%; padding: 12px; margin-bottom: 20px; background: #1a0508; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
     
-    /* BGMラベル追加 */
     .bgm-label { margin-bottom: 5px; font-size: 0.9rem; }
     .bgm-group { display: flex; gap: 10px; margin-bottom: 20px; }
     .bgm-btn { flex: 1; padding: 10px; border: 1px solid #d4af37; background: none; color: #d4af37; cursor: pointer; }
@@ -33,14 +34,17 @@
     #gallery, #work-view { display: none; padding-top: 100px; text-align: center; position: relative; z-index: 400; }
     .room-card { display: block; width: 80%; max-width: 250px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; background: rgba(0,0,0,0.3); }
     
-    .slider-img { width: 80%; max-width: 400px; height: 300px; object-fit: contain; display: none; margin: 0 auto; }
+    .slider-img { width: 80%; max-width: 400px; height: 300px; object-fit: contain; display: none; margin: 0 auto; border: 1px solid #d4af37; }
     .slider-img.active { display: block; }
     .nav-container { display: flex; justify-content: center; align-items: center; gap: 20px; margin: 20px auto; }
     .nav-btn { cursor: pointer; background: none; border: 1px solid #d4af37; color: #d4af37; padding: 10px 20px; }
   </style>
 </head>
 <body>
-  <div class="header-title">アートクリエイター・児童文化部</div>
+  <div class="header-container">
+    <div class="header-title">アートクリエイター・児童文化部</div>
+    <div class="horizontal-line"></div>
+  </div>
   <div class="door-line"></div>
 
   <div id="door-overlay">
@@ -88,6 +92,7 @@
         document.body.classList.add('gallery-mode');
         setTimeout(() => { 
             document.getElementById('ui-panel').style.display = 'none'; 
+            document.querySelector('.header-container').style.display = 'none';
             document.getElementById('gallery').style.display = 'block'; 
         }, 1000);
       } else { alert("パスワードが間違ってます！\nもう一度確認してください！"); }
@@ -112,12 +117,15 @@
       
       const area = document.getElementById('slider-area');
       area.innerHTML = '';
-      currentIdx = 0; // 部屋を変えるたびに1ページ目から
+      currentIdx = 0; 
 
       if(name === 'A') {
           currentImgs = aImages;
           currentImgs.forEach((src, i) => {
-              area.innerHTML += `<img src="${src}" class="slider-img ${i===0?'active':''}">`;
+              const img = document.createElement('img');
+              img.src = src;
+              img.className = `slider-img ${i===0?'active':''}`;
+              area.appendChild(img);
           });
           updatePageInfo();
       } else {
