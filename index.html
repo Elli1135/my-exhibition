@@ -5,35 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>児童文化部 個展会場</title>
   <style>
-    body { margin: 0; background: #290a0f; color: #d4af37; font-family: 'Yu Mincho', serif; }
+    body { margin: 0; background: #1a0b0d; color: #d4af37; font-family: 'Yu Mincho', serif; }
     
-    /* 扉演出：z-indexを下げ、他の要素の後ろで開くようにする */
-    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 500; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
-    .door { width: 50%; height: 100%; background: #4a0e17; border-left: 2px solid #d4af37; border-right: 2px solid #d4af37; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    /* 1. 黄色い縦線：背景より後ろに配置 */
+    .vertical-line { position: fixed; top:0; left: 50%; width: 2px; height: 100%; background: #d4af37; z-index: 100; }
+
+    /* 扉演出：z-indexを下げ、縦線よりも後ろで動く */
+    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
+    .door { width: 50%; height: 100%; background: #4a0e17; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* パネルを最前面へ */
-    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; z-index: 1000; }
+    /* 2. UIパネル：赤黒い背景と枠で囲む */
+    #ui-panel { 
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+      width: 85%; max-width: 400px; text-align: center; z-index: 300;
+      background: rgba(41, 10, 15, 0.8); /* 赤黒い半透明背景 */
+      border: 2px solid rgba(139, 0, 0, 0.8); /* 濃い赤の枠 */
+      padding: 30px; border-radius: 10px;
+    }
+    
     input { width: 100%; padding: 15px; margin-bottom: 20px; background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
     
-    /* BGM見出しとボタン */
     .bgm-title { margin-bottom: 5px; font-size: 0.9rem; }
     .bgm-tab { display: flex; border: 1px solid #d4af37; border-radius: 50px; overflow: hidden; margin-bottom: 20px; }
     .tab-btn { flex: 1; padding: 10px; background: #290a0f; color: #d4af37; border: none; cursor: pointer; }
     .tab-btn.active { background: #d4af37; color: #1a0b0d; }
     #open-btn { width: 100%; padding: 15px; background: none; border: 2px solid #d4af37; color: #d4af37; font-weight: bold; cursor: pointer; }
 
-    /* 展示室 */
-    #gallery { display: none; padding: 40px 20px; text-align: center; }
+    /* 作品展示室 */
+    #gallery { display: none; padding: 40px 20px; text-align: center; z-index: 400; position: relative; }
     .work-container { max-width: 600px; margin: 40px auto; border: 1px solid #d4af37; padding: 20px; }
     .slider { position: relative; width: 100%; height: 300px; background: #333; display: flex; align-items: center; justify-content: center; }
-    .slider .dummy-img { width: 80%; height: 60%; background: #d4af37; display: none; }
-    .slider .dummy-img.active { display: block; }
+    .dummy-img { width: 80%; height: 60%; background: #d4af37; display: none; }
+    .dummy-img.active { display: block; }
     .nav-btn { position: absolute; top: 50%; cursor: pointer; background: rgba(0,0,0,0.5); color: white; border: none; padding: 10px; }
   </style>
 </head>
 <body>
+  <div class="vertical-line"></div>
   <audio id="bgm" src="bgm.mp3" loop></audio>
 
   <div id="door-overlay">
@@ -58,11 +68,6 @@
 
   <script>
     let bgmEnabled = false;
-    const workData = {
-      'a': [1, 2, 3, 4], 
-      'b': [1], 'c': [1], 'd': [1], 'e': [1], 'f': [1], 'g': [1], 'h': [1], 'i': [1], 'j': [1]
-    };
-
     function setBGM(state) {
       bgmEnabled = state;
       document.getElementById('bgm-on').className = state ? 'tab-btn active' : 'tab-btn';
@@ -73,10 +78,15 @@
       if (document.getElementById('pass').value === "1234") {
         if (bgmEnabled) document.getElementById('bgm').play();
         document.getElementById('door-overlay').classList.add('open');
-        setTimeout(() => { document.getElementById('gallery').style.display = 'block'; document.getElementById('ui-panel').style.display = 'none'; }, 1000);
+        // ドアが開いたタイミングでパネルを隠し、展示室を表示
+        setTimeout(() => { 
+            document.getElementById('ui-panel').style.display = 'none'; 
+            document.getElementById('gallery').style.display = 'block'; 
+        }, 1000);
       } else { alert("パスワードが違います"); }
     }
 
+    const workData = {'a': [1, 2, 3, 4], 'b': [1], 'c': [1], 'd': [1], 'e': [1], 'f': [1], 'g': [1], 'h': [1], 'i': [1], 'j': [1]};
     const displayArea = document.getElementById('display-area');
     Object.keys(workData).forEach(name => {
       displayArea.innerHTML += `
