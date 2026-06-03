@@ -9,7 +9,8 @@
       margin: 0; padding: 0; 
       background: radial-gradient(circle at 50% 50%, #4a0e17 0%, #290a0f 50%, #1a0b0d 100%); 
       color: #d4af37; font-family: 'Times New Roman', serif; 
-      overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
     }
 
     #door-overlay { 
@@ -26,35 +27,34 @@
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* これでもかというほど巨大化させる */
+    /* 圧倒的なサイズ感への再調整 */
     #door-panel { 
       z-index: 10000; text-align: center; 
-      width: 90%; max-width: 600px; padding: 80px 40px; 
-      background: rgba(0, 0, 0, 0.7); 
-      border: 6px double #d4af37;
-      box-shadow: 0 0 80px rgba(0,0,0,1);
+      width: 95%; /* 画面幅ギリギリまで広げる */
+      max-width: 800px; /* 限界まで大きく */
+      padding: 100px 60px; 
+      background: rgba(0, 0, 0, 0.8); 
+      border: 8px double #d4af37;
+      box-shadow: 0 0 100px rgba(0,0,0,1);
     }
     
-    #pass-input { 
-      width: 100%; padding: 30px; margin-bottom: 40px; 
-      background: #1a0b0d; border: 3px solid #d4af37; 
-      color: #d4af37; font-size: 2.5rem; text-align: center; 
-      box-sizing: border-box;
+    /* BGM切替ボタン（2枚目の画像を再現：横並び） */
+    .bgm-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 40px; }
+    .bgm-btn { 
+      padding: 30px 40px; font-size: 2.0rem; cursor: pointer; 
+      background: #290a0f; border: 3px solid #d4af37; color: #d4af37;
+      font-weight: bold; width: 45%;
     }
-    
+    .bgm-btn.active { background: #d4af37; color: #1a0b0d; }
+
+    /* OPENボタン */
     #enter-btn { 
-      width: 100%; padding: 30px; background: #d4af37; 
-      border: none; color: #1a0b0d; 
-      font-size: 2.5rem; font-weight: 900; cursor: pointer; 
-      margin-bottom: 40px; transition: 0.3s;
+      width: 100%; padding: 50px 0; background: #290a0f; 
+      border: 4px solid #d4af37; color: #d4af37; 
+      font-size: 4.0rem; font-weight: 900; cursor: pointer; 
+      transition: 0.3s;
     }
-    #enter-btn:hover { background: #fff; transform: scale(1.05); }
-    
-    #bgm-toggle { 
-      width: 100%; padding: 20px; background: #4a0e17; 
-      border: 2px solid #d4af37; color: #d4af37; 
-      cursor: pointer; font-size: 1.5rem;
-    }
+    #enter-btn:hover { background: #d4af37; color: #1a0b0d; }
   </style>
 </head>
 <body>
@@ -64,9 +64,11 @@
   <div id="door-overlay">
     <div class="door door-left"></div>
     <div id="door-panel">
-      <input type="password" id="pass-input" placeholder="Password">
+      <div class="bgm-container">
+        <button id="bgm-on" class="bgm-btn" onclick="setBGM(true)">BGM ON</button>
+        <button id="bgm-mute" class="bgm-btn" onclick="setBGM(false)">MUTE</button>
+      </div>
       <button id="enter-btn">OPEN</button>
-      <button id="bgm-toggle" onclick="toggleBGM()">BGM: <span id="bgm-status">OFF</span></button>
     </div>
     <div class="door door-right"></div>
   </div>
@@ -74,22 +76,21 @@
   <script>
     const overlay = document.getElementById('door-overlay');
     const bgm = document.getElementById('bgm');
-    const bgmStatus = document.getElementById('bgm-status');
     let bgmEnabled = false;
 
-    function toggleBGM() {
-      bgmEnabled = !bgmEnabled;
-      bgmStatus.innerText = bgmEnabled ? "ON" : "OFF";
+    function setBGM(enabled) {
+      bgmEnabled = enabled;
+      document.getElementById('bgm-on').className = enabled ? 'bgm-btn active' : 'bgm-btn';
+      document.getElementById('bgm-mute').className = !enabled ? 'bgm-btn active' : 'bgm-btn';
     }
 
     document.getElementById('enter-btn').addEventListener('click', () => {
-      if (document.getElementById('pass-input').value === "1234") {
-        if (bgmEnabled) { bgm.play().catch(e => console.log("BGM restricted")); }
-        overlay.classList.add('open');
-      } else {
-        alert('パスワードが違います');
-      }
+      if (bgmEnabled) { bgm.play().catch(e => console.log(e)); }
+      overlay.classList.add('open');
     });
+
+    // 初期状態
+    setBGM(false);
   </script>
 </body>
 </html>
