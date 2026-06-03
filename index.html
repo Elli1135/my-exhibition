@@ -5,32 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>アートクリエイター・児童文化部 個展</title>
   <style>
-    /* アニメーション前の背景：濃い赤色 */
+    /* アニメーション前：濃い赤色 */
     body { margin: 0; background: #2e090f; color: #d4af37; font-family: 'Yu Mincho', serif; min-height: 100vh; }
-    /* アニメーション後の背景：ワイン色 */
+    /* アニメーション後：ワイン色 */
     body.gallery-mode { background: #4a0e17; }
 
-    /* 縦線：タイトル下から始まるように配置 */
+    /* タイトルと線：タイトル下の余白を確保し、線を重ならないように調整 */
     .header-title { position: absolute; top: 30px; width: 100%; text-align: center; font-size: 1.2rem; letter-spacing: 0.1rem; z-index: 300; }
-    .door-line { position: fixed; top: 80px; left: 50%; width: 2px; height: calc(100% - 80px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
+    .door-line { position: fixed; top: 70px; left: 50%; width: 2px; height: calc(100% - 70px); background: #d4af37; z-index: 100; transform: translateX(-50%); }
     
     #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 200; display: flex; transition: opacity 1.5s; background: #2e090f; pointer-events: none; }
     .door { width: 50%; height: 100%; background: #2e090f; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #d4af37; pointer-events: auto; }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* パスワード入力エリア */
     #ui-panel { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 300px; text-align: center; z-index: 300; }
     input { width: 100%; padding: 12px; margin-bottom: 20px; background: #1a0508; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
     
-    /* BGMボタン：ONとOFFの2択 */
+    /* BGMラベル追加 */
+    .bgm-label { margin-bottom: 5px; font-size: 0.9rem; }
     .bgm-group { display: flex; gap: 10px; margin-bottom: 20px; }
     .bgm-btn { flex: 1; padding: 10px; border: 1px solid #d4af37; background: none; color: #d4af37; cursor: pointer; }
     .bgm-btn.active { background: #d4af37; color: #1a0508; }
     
     #open-btn { width: 100%; padding: 12px; border: 1px solid #d4af37; background: none; color: #d4af37; cursor: pointer; }
 
-    /* 展示室 */
     #gallery, #work-view { display: none; padding-top: 100px; text-align: center; position: relative; z-index: 400; }
     .room-card { display: block; width: 80%; max-width: 250px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; background: rgba(0,0,0,0.3); }
     
@@ -51,6 +50,7 @@
 
   <div id="ui-panel">
     <input type="password" id="pass" placeholder="パスワード">
+    <div class="bgm-label">BGM</div>
     <div class="bgm-group">
       <button id="bgm-on" class="bgm-btn" onclick="toggleBGM(true)">ON</button>
       <button id="bgm-off" class="bgm-btn active" onclick="toggleBGM(false)">OFF</button>
@@ -67,16 +67,17 @@
     <div id="slider-area"></div>
     <div class="nav-container">
         <button class="nav-btn" onclick="move(-1)">◀</button>
-        <span id="page-info" style="color:#d4af37;">1 / 4</span>
+        <span id="page-info" style="color:#d4af37;"></span>
         <button class="nav-btn" onclick="move(1)">▶</button>
     </div>
     <button onclick="backToMenu()" style="margin-top:20px; background:none; border:1px solid #d4af37; color:#d4af37; padding:10px;">展示室一覧へ</button>
   </div>
 
   <script>
-    let bgmState = false;
+    let currentIdx = 0;
+    let currentImgs = [];
+
     function toggleBGM(state) {
-      bgmState = state;
       document.getElementById('bgm-on').className = state ? 'bgm-btn active' : 'bgm-btn';
       document.getElementById('bgm-off').className = !state ? 'bgm-btn active' : 'bgm-btn';
     }
@@ -111,23 +112,32 @@
       
       const area = document.getElementById('slider-area');
       area.innerHTML = '';
+      currentIdx = 0; // 部屋を変えるたびに1ページ目から
+
       if(name === 'A') {
-          aImages.forEach((src, i) => {
-              area.innerHTML += `<img src="${src}" class="slider-img ${i===0?'active':''}" onerror="this.style.display='none'">`;
+          currentImgs = aImages;
+          currentImgs.forEach((src, i) => {
+              area.innerHTML += `<img src="${src}" class="slider-img ${i===0?'active':''}">`;
           });
+          updatePageInfo();
       } else {
-          area.innerHTML = '<p>準備中です</p>';
+          currentImgs = [];
+          area.innerHTML = '<p style="color:#d4af37;">準備中です</p>';
+          document.getElementById('page-info').innerText = '';
       }
     }
 
     function move(dir) {
+      if (currentImgs.length === 0) return;
       const imgs = document.querySelectorAll('.slider-img');
-      if (imgs.length === 0) return;
-      let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-      imgs[idx].classList.remove('active');
-      idx = (idx + dir + imgs.length) % imgs.length;
-      imgs[idx].classList.add('active');
-      document.getElementById('page-info').innerText = (idx + 1) + ' / ' + imgs.length;
+      imgs[currentIdx].classList.remove('active');
+      currentIdx = (currentIdx + dir + currentImgs.length) % currentImgs.length;
+      imgs[currentIdx].classList.add('active');
+      updatePageInfo();
+    }
+
+    function updatePageInfo() {
+      document.getElementById('page-info').innerText = (currentIdx + 1) + ' / ' + currentImgs.length;
     }
 
     function backToMenu() {
