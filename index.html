@@ -1,49 +1,96 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>限定画像ビューア - 大合同個展</title>
-    <style>
-        /* 🎨 全体のデザイン */
-        html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 0%, #7a1f29 0%, #4a0e17 50%, #290a0f 100%);
-            overflow: hidden; font-family: 'Times New Roman', serif;
-        }
-        /* パスワード画面のデザイン */
-        #password-area {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; color: white; text-align: center;
-        }
-        #pass-input { padding: 10px; border-radius: 5px; border: none; margin: 10px; }
-        button { padding: 10px 20px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アートクリエイター・児童文化部へようこそ！</title>
+  <style>
+    /* パスワード画面のスタイル */
+    #password-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #290a0f; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
+    #pass-input { padding: 12px; margin: 15px; border-radius: 8px; border: none; width: 200px; }
+    .auth-btn { padding: 10px 25px; cursor: pointer; background: #d4af37; border: none; border-radius: 20px; font-weight: bold; color: #1a0b0d; }
+
+    /* 元の個展のスタイル */
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, #7a1f29 0%, #4a0e17 50%, #2b0409 100%); overflow: hidden; font-family: 'Times New Roman', Georgia, '游明朝', YuMincho, serif; }
+    .container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 15px 10px; box-sizing: border-box; }
+    h2 { color: #d4af37; margin-top: 5px; margin-bottom: 10px; font-size: 1.4rem; letter-spacing: 0.2em; text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.7); flex-shrink: 0; }
+    #menu-area { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; flex: 1; width: 100%; max-width: 360px; overflow: hidden; margin-bottom: 10px; }
+    .button-list { display: flex; flex-direction: column; gap: 10px; width: 100%; flex: 1; overflow-y: auto; }
+    .author-row { display: flex; justify-content: space-between; align-items: center; width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 6px; padding: 6px 8px; box-sizing: border-box; }
+    .author-btn { flex: 1; max-width: 65%; background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; padding: 12px 5px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 4px; }
+    .wait-status { font-size: 0.85rem; font-weight: bold; padding: 8px 10px; border-radius: 4px; min-width: 85px; text-align: center; color: #28a745; border: 1px solid rgba(40, 167, 69, 0.4); }
+    .status-busy { color: #dc3545; border-color: rgba(220, 53, 69, 0.4); }
+    #slider-area { display: none; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; flex: 1; }
+    .image-area img { max-width: 100%; max-height: 70vh; object-fit: contain; }
+    .nav-btn { background: none; border: none; font-size: 2.2rem; color: #d4af37; cursor: pointer; }
+    .back-btn { background: none; border: 1px solid rgba(212, 175, 55, 0.5); color: #bfa5a8; padding: 6px 15px; cursor: pointer; }
+    #door-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; display: flex; transition: opacity 1s ease-in-out; }
+    .door { width: 50%; height: 100%; background: #1a0b0d; border: 4px solid #d4af37; }
+    .door-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 101; width: 280px; text-align: center; }
+    .enter-btn { background: #1a0b0d; border: 2px solid #d4af37; color: #d4af37; padding: 15px 5px; width: 100%; font-size: 1.4rem; cursor: pointer; }
+  </style>
 </head>
 <body>
 
-    <div id="password-area">
-        <h3>部員専用ページです。パスワードを入力してください。</h3>
-        <input type="password" id="pass-input">
-        <button onclick="checkPassword()">入室する</button>
+  <div id="gallery-body" style="display:none;">
+               <div id="door-overlay">
+      <div class="door door-left"></div>
+      <div id="door-panel" class="door-panel">
+        <div class="bgm-selector">
+          <button id="btn-sound-on" class="select-btn active">🔊 BGM ON</button>
+          <button id="btn-sound-off" class="select-btn">🔇 MUTE</button>
+        </div>
+        <input type="password" id="pass-input" placeholder="パスワードを入力" 
+               style="padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #d4af37; background: #000; color: #fff; width: 80%;">
+        <button id="enter-btn" class="enter-btn">OPEN</button>
+      </div>
+      <div class="door door-right"></div>
     </div>
 
-    <div id="main-content" style="display:none;">
-        <h1>個展会場へようこそ！</h1>
+    <div class="container">
+      <h2 id="gallery-title">館内案内</h2>
+      <div id="menu-area">
+        <div class="button-list">
+          <div class="author-row"><button class="author-btn" data-room="1">ルーム 1 ➔</button><div class="wait-status">待ちなし！</div></div>
+          <div class="author-row"><button class="author-btn" data-room="2">ルーム 2 ➔</button><div class="wait-status status-busy">15分待ち</div></div>
+          <div class="author-row"><button class="author-btn" data-room="3">ルーム 3 ➔</button><div class="wait-status status-busy">40分待ち</div></div>
+          <div class="author-row"><button class="author-btn" data-room="4">ルーム 4 ➔</button><div class="wait-status">即行ける！</div></div>
+          <div class="author-row"><button class="author-btn" data-room="5">ルーム 5 ➔</button><div class="wait-status">即行ける！</div></div>
+          <div class="author-row"><button class="author-btn" data-room="6">ルーム 6 ➔</button><div class="wait-status">即行ける！</div></div>
+          <div class="author-row"><button class="author-btn" data-room="7">ルーム 7 ➔</button><div class="wait-status">即行ける！</div></div>
+          <div class="author-row"><button class="author-btn" data-room="8">ルーム 8 ➔</button><div class="wait-status">即行ける！</div></div>
+          <div class="author-row"><button class="author-btn" data-room="9">ルーム 9 ➔</button><div class="wait-status">即行ける！</div></div>
+          <div class="author-row"><button class="author-btn" data-room="10">ルーム 10 ➔</button><div class="wait-status">即行ける！</div></div>
         </div>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        function checkPassword() {
-            // ★ここを実際のパスワードに変更してください
-            const correctPass = "Art_Creator"; 
-            
-            if (document.getElementById('pass-input').value === correctPass) {
-                document.getElementById('password-area').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-            } else {
-                alert('パスワードが違います！');
-            }
-        }
-    </script>
+  <script>
+      // パスワードで開く新しい処理
+    document.getElementById('enter-btn').addEventListener('click', () => {
+      const pass = document.getElementById('pass-input').value;
+      if (pass === "1234") { 
+        if (isBgmEnabled) { bgm.play().catch(e => {}); }
+        document.getElementById('door-panel').style.opacity = '0';
+        document.getElementById('door-overlay').classList.add('open');
+        setTimeout(() => { 
+          document.getElementById('door-overlay').style.display = 'none';
+          document.getElementById('gallery-body').style.display = 'flex';
+        }, 1200);
+      } else {
+        alert('パスワードが違います！');
+      }
+    });
+
+    const roomsData = {
+      "1": ["https://picsum.photos/id/10/600/900"], "2": ["https://picsum.photos/id/12/600/600"],
+      "3": ["https://picsum.photos/id/14/600/900"], "4": ["https://picsum.photos/id/15/600/900"],
+      "5": ["https://picsum.photos/id/16/600/900"], "6": ["https://picsum.photos/id/17/600/900"],
+      "7": ["https://picsum.photos/id/18/600/900"], "8": ["https://picsum.photos/id/19/600/900"],
+      "9": ["https://picsum.photos/id/20/600/900"], "10": ["https://picsum.photos/id/21/600/900"]
+    };
+    // （※ここに元のscriptの続きを貼り付けてもOKです！）
+  </script>
 </body>
 </html>
