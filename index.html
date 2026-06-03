@@ -5,27 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>アートクリエイター・児童文化部 個展</title>
   <style>
-    body { margin: 0; background: #290a0f; color: #d4af37; font-family: 'Times New Roman', serif; overflow-x: hidden; }
+    body { margin: 0; background: #1a0b0d; color: #d4af37; font-family: 'Times New Roman', serif; }
     
-    /* 美術館の扉 */
-    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 999; display: flex; transition: opacity 1.2s; background: #1a0b0d; }
-    .door { width: 50%; height: 100%; background: #4a0e17; border: 2px solid #d4af37; transition: transform 2.0s cubic-bezier(0.4, 0, 0.2, 1); }
+    /* 扉エリア */
+    #door-overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: 999; display: flex; transition: opacity 1.5s; background: #1a0b0d; }
+    .door { width: 50%; height: 100%; background: linear-gradient(to right, #4a0e17, #290a0f); border: 1px solid #d4af37; transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1); }
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* 扉のパネル（中央にパスワードと操作ボタン） */
-    #door-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; text-align: center; width: 80%; max-width: 350px; }
-    #pass-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #d4af37; background: #1a0b0d; color: #d4af37; text-align: center; }
-    #enter-btn { width: 100%; padding: 15px; background: #d4af37; border: none; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
-    .bgm-btns { display: flex; gap: 10px; justify-content: center; }
-    .bgm-btn { flex: 1; padding: 10px; background: #4a0e17; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; }
-    .bgm-btn.active { background: #d4af37; color: #1a0b0d; }
-
-    /* ギャラリー内部（1〜10のリスト） */
-    #gallery-body { display: none; padding: 40px 20px; text-align: center; }
-    .room-list { display: flex; flex-direction: column; gap: 15px; align-items: center; }
-    .room-row { width: 100%; max-width: 400px; padding: 15px; border: 1px solid #d4af37; display: flex; justify-content: space-between; align-items: center; }
-    .room-btn { cursor: pointer; background: #d4af37; border: none; padding: 10px 20px; color: #1a0b0d; font-weight: bold; }
+    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 400px; text-align: center; }
+    input, button { width: 100%; padding: 15px; margin: 10px 0; background: #290a0f; border: 1px solid #d4af37; color: #d4af37; font-size: 1.2rem; cursor: pointer; }
+    
+    /* ギャラリー内部 */
+    #gallery { display: none; padding: 20px; text-align: center; }
+    .author-card { border: 1px solid #d4af37; margin: 20px auto; padding: 20px; width: 90%; max-width: 500px; }
+    .slider { position: relative; margin: 10px 0; }
+    .slider img { width: 100%; height: auto; display: none; border: 1px solid #d4af37; }
+    .slider img.active { display: block; }
+    .nav-btn { position: absolute; top: 50%; background: rgba(0,0,0,0.5); border: none; color: #d4af37; padding: 10px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -34,51 +31,63 @@
 
   <div id="door-overlay">
     <div class="door door-left"></div>
-    <div id="door-panel">
-      <input type="password" id="pass-input" placeholder="PASSWORD">
-      <button id="enter-btn">OPEN</button>
-      <div class="bgm-btns">
-        <button id="bgm-on" class="bgm-btn" onclick="setBGM(true)">BGM ON</button>
-        <button id="bgm-mute" class="bgm-btn active" onclick="setBGM(false)">MUTE</button>
+    <div id="ui-panel">
+      <input type="password" id="pass" placeholder="PASSWORD">
+      <button onclick="enter()">OPEN</button>
+      <div style="display:flex; gap:10px;">
+        <button id="btn-on" onclick="setBGM(true)">BGM ON</button>
+        <button id="btn-off" onclick="setBGM(false)">MUTE</button>
       </div>
     </div>
     <div class="door door-right"></div>
   </div>
 
-  <div id="gallery-body">
-    <h1>児童文化部 個展会場</h1>
-    <div class="room-list" id="room-list">
-      </div>
+  <div id="gallery">
+    <h1>展覧会会場</h1>
+    <div id="author-list"></div>
   </div>
 
   <script>
-    const overlay = document.getElementById('door-overlay');
-    const gallery = document.getElementById('gallery-body');
-    const bgm = document.getElementById('bgm');
     let bgmEnabled = false;
+    const bgm = document.getElementById('bgm');
+    const authors = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+    
+    // aさんは4枚、他は1枚のデータ構造
+    const works = {
+      'a': ['img1.jpg', 'img2.jpg', 'img3.jpg', 'img4.jpg'],
+      'b': ['img1.jpg'], 'c': ['img1.jpg'], 'd': ['img1.jpg'], 'e': ['img1.jpg'],
+      'f': ['img1.jpg'], 'g': ['img1.jpg'], 'h': ['img1.jpg'], 'i': ['img1.jpg'], 'j': ['img1.jpg']
+    };
 
-    // ルームリスト生成
-    const roomList = document.getElementById('room-list');
-    for(let i=1; i<=10; i++) {
-      const row = document.createElement('div');
-      row.className = 'room-row';
-      row.innerHTML = `<span>ルーム ${i}</span><button class="room-btn" onclick="alert('ルーム${i}の作品へ')">Enter</button>`;
-      roomList.appendChild(row);
+    function setBGM(state) {
+      bgmEnabled = state;
+      document.getElementById('btn-on').style.background = state ? '#d4af37' : '#290a0f';
+      document.getElementById('btn-off').style.background = !state ? '#d4af37' : '#290a0f';
     }
 
-    function setBGM(enabled) {
-      bgmEnabled = enabled;
-      document.getElementById('bgm-on').className = enabled ? 'bgm-btn active' : 'bgm-btn';
-      document.getElementById('bgm-mute').className = !enabled ? 'bgm-btn active' : 'bgm-btn';
+    function enter() {
+      if (document.getElementById('pass').value === "1234") {
+        if (bgmEnabled) bgm.play();
+        document.getElementById('door-overlay').classList.add('open');
+        setTimeout(() => { document.getElementById('gallery').style.display = 'block'; }, 1000);
+      }
     }
 
-    document.getElementById('enter-btn').addEventListener('click', () => {
-      if (document.getElementById('pass-input').value === "1234") {
-        if (bgmEnabled) { bgm.play().catch(e => console.log(e)); }
-        overlay.classList.add('open');
-        setTimeout(() => { gallery.style.display = 'block'; }, 1000);
-      } else { alert('パスワードが違います'); }
+    const list = document.getElementById('author-list');
+    authors.forEach(name => {
+      let div = document.createElement('div');
+      div.className = 'author-card';
+      div.innerHTML = `<h3>${name}さんの作品</h3>
+        <div class="slider" id="slider-${name}">
+          ${works[name].map((img, i) => `<img src="${img}" class="${i===0?'active':''}">`).join('')}
+          ${works[name].length > 1 ? `<button class="nav-btn" style="left:0" onclick="move('${name}', -1)">◀</button><button class="nav-btn" style="right:0" onclick="move('${name}', 1)">▶</button>` : ''}
+          <p>1 / ${works[name].length}</p>
+        </div>`;
+      list.appendChild(div);
     });
+
+    function move(name, dir) { /* スライダー制御ロジックはここに追加 */ }
   </script>
+</script>
 </body>
 </html>
