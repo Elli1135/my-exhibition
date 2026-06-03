@@ -2,13 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>アートクリエイター・児童文化部 個展会場</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>個展会場</title>
   <style>
     body { 
       margin: 0; padding: 0; 
       background: radial-gradient(circle at 50% 50%, #4a0e17 0%, #290a0f 50%, #1a0b0d 100%); 
-      color: #d4af37; font-family: 'Times New Roman', '游明朝', serif; 
-      overflow: hidden; height: 100vh;
+      color: #d4af37; font-family: 'Times New Roman', serif; 
+      overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center;
     }
 
     #door-overlay { 
@@ -25,41 +26,35 @@
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* さらにパネルを大きく、威圧感を出す */
+    /* これでもかというほど巨大化させる */
     #door-panel { 
-      position: absolute; top: 50%; left: 50%; 
-      transform: translate(-50%, -50%); 
       z-index: 10000; text-align: center; 
-      width: 450px; padding: 60px; 
-      background: rgba(0, 0, 0, 0.6); 
-      border: 4px double #d4af37;
-      box-shadow: 0 0 50px rgba(0,0,0,0.9);
+      width: 90%; max-width: 600px; padding: 80px 40px; 
+      background: rgba(0, 0, 0, 0.7); 
+      border: 6px double #d4af37;
+      box-shadow: 0 0 80px rgba(0,0,0,1);
     }
     
-    /* 入力欄をさらに強調 */
     #pass-input { 
-      width: 100%; padding: 25px; margin-bottom: 30px; 
-      background: #1a0b0d; border: 2px solid #d4af37; 
-      color: #d4af37; font-size: 1.8rem; text-align: center; 
-      box-sizing: border-box; letter-spacing: 3px;
+      width: 100%; padding: 30px; margin-bottom: 40px; 
+      background: #1a0b0d; border: 3px solid #d4af37; 
+      color: #d4af37; font-size: 2.5rem; text-align: center; 
+      box-sizing: border-box;
     }
     
-    /* ボタンを極大化 */
     #enter-btn { 
-      width: 100%; padding: 25px; background: #290a0f; 
-      border: 3px solid #d4af37; color: #d4af37; 
-      font-size: 2.0rem; font-weight: bold; cursor: pointer; 
-      margin-bottom: 30px; transition: all 0.4s ease;
+      width: 100%; padding: 30px; background: #d4af37; 
+      border: none; color: #1a0b0d; 
+      font-size: 2.5rem; font-weight: 900; cursor: pointer; 
+      margin-bottom: 40px; transition: 0.3s;
     }
-    #enter-btn:hover { background: #d4af37; color: #1a0b0d; transform: scale(1.05); }
+    #enter-btn:hover { background: #fff; transform: scale(1.05); }
     
-    /* BGM操作ボタン */
     #bgm-toggle { 
       width: 100%; padding: 20px; background: #4a0e17; 
       border: 2px solid #d4af37; color: #d4af37; 
-      cursor: pointer; font-size: 1.4rem; transition: 0.3s;
+      cursor: pointer; font-size: 1.5rem;
     }
-    #bgm-toggle:hover { background: #d4af37; color: #1a0b0d; }
   </style>
 </head>
 <body>
