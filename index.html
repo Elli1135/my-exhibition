@@ -5,9 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>アートクリエイター・児童文化部 個展</title>
   <style>
-    body { margin: 0; background: #1a0b0d; color: #d4af37; font-family: 'Yu Mincho', serif; }
+    /* 全体の背景：上から下へのワイン色グラデーション＋光の演出 */
+    body { 
+      margin: 0; 
+      background: radial-gradient(circle at 50% -20%, #7d1b28, #1a0b0d); 
+      color: #d4af37; 
+      font-family: 'Yu Mincho', serif; 
+      min-height: 100vh;
+    }
     
-    /* 扉・ラインの演出 */
     .door-line { position: fixed; top: 0; left: 50%; width: 2px; height: 100%; background: #d4af37; z-index: 100; transform: translateX(-50%); }
     .header-title { position: absolute; top: 30px; width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 0.2rem; z-index: 300; border-bottom: 1px solid #d4af37; padding-bottom: 10px; }
     
@@ -16,17 +22,16 @@
     #door-overlay.open .door-left { transform: translateX(-100%); }
     #door-overlay.open .door-right { transform: translateX(100%); }
     
-    /* パスワードパネル */
-    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; z-index: 300; background: rgba(41, 10, 15, 0.8); border: 2px solid rgba(139, 0, 0, 0.8); padding: 30px; border-radius: 10px; }
-    input { width: 100%; padding: 15px; margin-bottom: 20px; background: #1a0b0d; border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
+    #ui-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; text-align: center; z-index: 300; background: rgba(60, 10, 15, 0.8); border: 2px solid rgba(139, 0, 0, 0.8); padding: 30px; border-radius: 10px; }
+    input { width: 100%; padding: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); border: 1px solid #d4af37; color: #d4af37; text-align: center; box-sizing: border-box; }
+    
     .bgm-tab { display: flex; border: 1px solid #d4af37; border-radius: 50px; overflow: hidden; margin-bottom: 20px; }
     .tab-btn { flex: 1; padding: 10px; background: #290a0f; color: #d4af37; border: none; cursor: pointer; }
     .tab-btn.active { background: #d4af37; color: #1a0b0d; }
     #open-btn { width: 100%; padding: 15px; background: none; border: 2px solid #d4af37; color: #d4af37; font-weight: bold; cursor: pointer; }
 
-    /* 展示室 */
     #gallery { display: none; padding: 100px 20px 40px; text-align: center; z-index: 400; position: relative; }
-    .room-card { display: block; width: 200px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; background: #290a0f; color: #d4af37; cursor: pointer; text-decoration: none; }
+    .room-card { display: block; width: 200px; margin: 10px auto; padding: 12px; border: 1px solid #d4af37; background: rgba(41, 10, 15, 0.5); color: #d4af37; cursor: pointer; text-decoration: none; }
     #work-view { display: none; padding: 20px; text-align: center; position: relative; z-index: 400; }
   </style>
 </head>
@@ -79,7 +84,9 @@
             document.querySelector('.header-title').style.display = 'none';
             document.getElementById('gallery').style.display = 'block'; 
         }, 1000);
-      } else { alert("パスワードが違います"); }
+      } else { 
+        alert("ポスターや教室にいる部員に聞いてね！"); 
+      }
     }
 
     const authors = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
